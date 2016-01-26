@@ -1,8 +1,8 @@
 // trainer.cs
 
+use std::collections::HashMap;
 use std::fs::File;
 use std::io::prelude::*;
-use std::collections::HashMap;
 
 pub type CountTable = HashMap<String, usize>;
 
