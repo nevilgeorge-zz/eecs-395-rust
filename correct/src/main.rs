@@ -1,6 +1,10 @@
+// main.rs
+
 use std::env;
+use std::io::{stdin};
 
 mod trainer;
+mod checker;
 
 fn main() {
     let args: Vec<_> = env::args().collect();
@@ -8,8 +12,9 @@ fn main() {
         panic!("Missing training file argument!");
     }
 
-    let table = trainer::read_from_file(&args[1]);
-    for (word, count) in table.iter() {
-        println!("{}: {}", word, count);
+    let corpus = trainer::read_from_file(&args[1]);
+    let words = checker::read_words(stdin());
+    for word in words {
+        println!("{}", word);
     }
 }
