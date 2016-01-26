@@ -40,3 +40,15 @@ pub fn add_insertions(set: &mut HashSet<String>, word: String) {
         set.insert(sub_word);
     }
 }
+
+pub fn add_replacements(set: &mut HashSet<String>, word: String) {
+    let alphabet = ALPHABET.to_owned();
+    let mut sub_word: String;
+
+    for i in 0..word.len() {
+        for c in alphabet.chars() {
+            sub_word = (&word[..i]).to_string() + &c.to_string() + &word[i + 1..];
+            set.insert(sub_word);
+        }
+    }
+}
