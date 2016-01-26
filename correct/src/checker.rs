@@ -52,3 +52,20 @@ pub fn add_replacements(set: &mut HashSet<String>, word: String) {
         }
     }
 }
+
+pub fn add_transpositions(set: &mut HashSet<String>, word: String) {
+    let mut sub_word: String;
+    let mut characters: Vec<char> = vec![];
+    for c in word.chars() {
+        characters.push(c);
+    }
+
+    for i in 0..word.len() - 1 {
+        // swap i and i + 1
+        sub_word = (&word[..i]).to_string();
+        sub_word.push(characters[i + (1 as usize)]);
+        sub_word.push(characters[i]);
+        sub_word = sub_word + &word[i + (2 as usize)..];
+        set.insert(sub_word);
+    }
+}

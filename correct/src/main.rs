@@ -23,6 +23,7 @@ fn main() {
         checker::add_deletions(&mut possible_words, word.clone());
         checker::add_insertions(&mut possible_words, word.clone());
         checker::add_replacements(&mut possible_words, word.clone());
+        checker::add_transpositions(&mut possible_words, word.clone());
     }
 
     for word in &possible_words {
