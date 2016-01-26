@@ -20,11 +20,11 @@ fn main() {
 
     // add all possible deletions
     for word in words {
-        checker::insert_deletions(&mut possible_words, word);
+        checker::add_deletions(&mut possible_words, word.clone());
+        checker::add_insertions(&mut possible_words, word.clone());
     }
 
     for word in &possible_words {
         println!("{}", word);
     }
-
 }
