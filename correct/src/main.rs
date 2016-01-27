@@ -17,17 +17,50 @@ fn main() {
     let words = checker::read_words(stdin());
 
     let mut possible_words: HashSet<String>;
+    let mut newly_added: Vec<String>;
 
     // add all possible deletions
     for word in words {
         possible_words = HashSet::<String>::new();
 
-        checker::add_deletions(&mut possible_words, word.clone());
-        checker::add_insertions(&mut possible_words, word.clone());
-        checker::add_replacements(&mut possible_words, word.clone());
-        checker::add_transpositions(&mut possible_words, word.clone());
+        newly_added = checker::add_deletions(&mut possible_words, word.clone());
+        for new_word in newly_added {
+            checker::add_deletions(&mut possible_words, new_word.clone());
+            checker::add_insertions(&mut possible_words, new_word.clone());
+            checker::add_replacements(&mut possible_words, new_word.clone());
+            checker::add_transpositions(&mut possible_words, new_word.clone());
+        }
 
-        let text = checker::find_most_likely_word(possible_words, &corpus);
-        println!("{}, {}", word, text);
+        newly_added = checker::add_insertions(&mut possible_words, word.clone());
+        for new_word in newly_added {
+            checker::add_deletions(&mut possible_words, new_word.clone());
+            checker::add_insertions(&mut possible_words, new_word.clone());
+            checker::add_replacements(&mut possible_words, new_word.clone());
+            checker::add_transpositions(&mut possible_words, new_word.clone());
+        }
+
+        newly_added = checker::add_replacements(&mut possible_words, word.clone());
+        for new_word in newly_added {
+            checker::add_deletions(&mut possible_words, new_word.clone());
+            checker::add_insertions(&mut possible_words, new_word.clone());
+            checker::add_replacements(&mut possible_words, new_word.clone());
+            checker::add_transpositions(&mut possible_words, new_word.clone());
+        }
+
+        newly_added = checker::add_transpositions(&mut possible_words, word.clone());
+        for new_word in newly_added {
+            checker::add_deletions(&mut possible_words, new_word.clone());
+            checker::add_insertions(&mut possible_words, new_word.clone());
+            checker::add_replacements(&mut possible_words, new_word.clone());
+            checker::add_transpositions(&mut possible_words, new_word.clone());
+        }
+
+        let correction = checker::find_most_likely_word(possible_words, &corpus);
+
+        if word == correction {
+            println!("{}", word);
+        } else {
+            println!("{}, {}", word, correction);
+        }
     }
 }
