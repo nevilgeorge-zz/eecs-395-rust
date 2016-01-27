@@ -21,7 +21,7 @@ pub fn read_from_file(filename: &str) -> CountTable {
     }
 }
 
-fn tokenize(corpus_string: String) -> CountTable {
+pub fn tokenize(corpus_string: String) -> CountTable {
     let mut table = CountTable::new();
 
     for word in corpus_string.split(" ") {
@@ -31,6 +31,6 @@ fn tokenize(corpus_string: String) -> CountTable {
     table
 }
 
-fn increment_word(mut map: &mut CountTable, word: String) {
+pub fn increment_word(mut map: &mut CountTable, word: String) {
     *map.entry(word).or_insert(0) += 1;
 }

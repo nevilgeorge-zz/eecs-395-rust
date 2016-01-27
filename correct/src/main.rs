@@ -7,6 +7,9 @@ use std::io::{stdin};
 mod trainer;
 mod checker;
 
+mod trainer_tests;
+mod checker_tests;
+
 fn main() {
     let args: Vec<_> = env::args().collect();
     if args.len() != 2 {
