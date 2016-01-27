@@ -1,9 +1,8 @@
 // checker.rs
 
-use std::collections::{HashMap, HashSet};
+use std::collections::HashSet;
 use std::io::{BufRead, BufReader, Read};
-
-pub type CountTable = HashMap<String, usize>;
+use super::CountTable;
 
 const ALPHABET: &'static str = "abcdefghijklmnopqrstuvwxyz";
 

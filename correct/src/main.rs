@@ -1,6 +1,6 @@
 // main.rs
 
-use std::collections::HashSet;
+use std::collections::{HashMap, HashSet};
 use std::env;
 use std::io::{stdin};
 
@@ -9,6 +9,8 @@ mod checker;
 
 mod trainer_tests;
 mod checker_tests;
+
+pub type CountTable = HashMap<String, usize>;
 
 fn main() {
     let args: Vec<_> = env::args().collect();

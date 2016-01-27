@@ -1,10 +1,8 @@
 // trainer.cs
 
-use std::collections::HashMap;
 use std::fs::File;
 use std::io::prelude::*;
-
-pub type CountTable = HashMap<String, usize>;
+use super::CountTable;
 
 pub fn read_from_file(filename: &str) -> CountTable {
 

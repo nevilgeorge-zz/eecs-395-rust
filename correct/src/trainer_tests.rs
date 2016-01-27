@@ -26,7 +26,8 @@ mod tokenize_tests {
 
 #[cfg(test)]
 mod increment_word_tests {
-    use trainer::{increment_word, CountTable};
+    use trainer::increment_word;
+    use super::super::CountTable;
 
     fn initialize() -> CountTable {
         let mut h = CountTable::new();
