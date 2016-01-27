@@ -1,7 +1,9 @@
 // checker.rs
 
-use std::collections::HashSet;
+use std::collections::{HashMap, HashSet};
 use std::io::{BufRead, BufReader, Read};
+
+pub type CountTable = HashMap<String, usize>;
 
 const ALPHABET: &'static str = "abcdefghijklmnopqrstuvwxyz";
 
@@ -68,4 +70,23 @@ pub fn add_transpositions(set: &mut HashSet<String>, word: String) {
         sub_word = sub_word + &word[i + (2 as usize)..];
         set.insert(sub_word);
     }
+}
+
+pub fn find_most_likely_word(possible_words: HashSet<String>, corpus: &CountTable) -> String {
+    let mut max_word: String = "-".to_string();
+    let mut max_value: usize = 0;
+
+    for word in &possible_words {
+        match corpus.get(word) {
+            Some(count) => {
+                if *count > max_value {
+                    max_value = *count;
+                    max_word = word.clone();
+                }
+            }
+            None => {},
+        }
+    }
+
+    max_word
 }

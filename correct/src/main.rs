@@ -16,17 +16,18 @@ fn main() {
     let corpus = trainer::read_from_file(&args[1]);
     let words = checker::read_words(stdin());
 
-    let mut possible_words = HashSet::<String>::new();
+    let mut possible_words: HashSet<String>;
 
     // add all possible deletions
     for word in words {
+        possible_words = HashSet::<String>::new();
+
         checker::add_deletions(&mut possible_words, word.clone());
         checker::add_insertions(&mut possible_words, word.clone());
         checker::add_replacements(&mut possible_words, word.clone());
         checker::add_transpositions(&mut possible_words, word.clone());
-    }
 
-    for word in &possible_words {
-        println!("{}", word);
+        let text = checker::find_most_likely_word(possible_words, &corpus);
+        println!("{}, {}", word, text);
     }
 }
