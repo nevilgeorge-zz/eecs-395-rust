@@ -6,12 +6,11 @@ mod reader;
 
 fn main() {
     println!("Hello, world!");
-    let result = reader::read_graph(stdin());
+    let result = reader::read_query(stdin());
 
-    for (key, list) in &result {
-        println!("{}", key);
-        for item in list {
-            println!("{}", item);
-        }
+    for input in result {
+        let (src, dest) = input;
+        println!("source: {}", src);
+        println!("destination: {}", dest);
     }
 }
