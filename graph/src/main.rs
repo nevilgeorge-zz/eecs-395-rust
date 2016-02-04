@@ -1,16 +1,24 @@
 // main.rs
 
+use std::env;
 use std::io::stdin;
 
 mod reader;
 
 fn main() {
     println!("Hello, world!");
-    let result = reader::read_query(stdin());
+    let args: Vec<_> = env::args().collect();
+    if args.len() != 2 {
+        panic!("Missing graph description file!");
+    }
 
-    for input in result {
-        let (src, dest) = input;
-        println!("source: {}", src);
-        println!("destination: {}", dest);
+    let result = reader::read_graph(&args[1]);
+
+    for (key, val) in &result {
+        println!("{}", key);
+        for v in val {
+            println!("{}", v);
+        }
+        println!("---------");
     }
 }
