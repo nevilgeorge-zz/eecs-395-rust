@@ -1,6 +1,6 @@
 // reader.rs
 
-use std::collections::HashMap;
+use std::collections::{HashMap, HashSet};
 use std::fs::File;
 use std::io::{BufRead, BufReader, Read};
 
@@ -26,12 +26,12 @@ pub fn read_query<R: Read>(reader: R) -> Vec<(String, String)> {
     nodes
 }
 
-pub fn read_graph(filename: &str) -> HashMap<String, Vec<String>> {
+pub fn read_graph(filename: &str) -> HashMap<String, HashSet<String>> {
 
-    let mut mapping = HashMap::<String, Vec<String>>::new();
+    let mut mapping = HashMap::<String, HashSet<String>>::new();
     let f = File::open(filename).expect("Error opening graph description file!");
     let lines = BufReader::new(&f).lines();
-    let mut adjacent_nodes: Vec<String>;
+    let mut adjacent_nodes: HashSet<String>;
 
     for line in lines {
         if let Ok(text) = line {
@@ -44,9 +44,9 @@ pub fn read_graph(filename: &str) -> HashMap<String, Vec<String>> {
                     break;
                 }
 
-                adjacent_nodes = vec![];
+                adjacent_nodes = HashSet::<String>::new();
                 for token in tokens {
-                    adjacent_nodes.push(token.to_owned());
+                    adjacent_nodes.insert(token.to_owned());
                 }
 
                 mapping.insert(node_key.to_owned(), adjacent_nodes);
@@ -56,5 +56,22 @@ pub fn read_graph(filename: &str) -> HashMap<String, Vec<String>> {
         }
     }
 
+    create_full_graph(&mut mapping);
     mapping
+}
+
+fn create_full_graph(mapping: &mut HashMap<String, HashSet<String>>) {
+    for (node, neighbors) in mapping {
+        for neighbor in neighbors.iter() {
+            println!("{}", neighbor);
+            // let set = mapping.get_mut(&neighbor).unwrap();
+            let mut set = mapping.get_mut(neighbor).unwrap();
+
+            // *set.insert(node);
+            // new_mapping.insert(node, *set);
+            // for item in set.iter() {
+            //     println!("{}", item);
+            // }
+        }
+    }
 }
