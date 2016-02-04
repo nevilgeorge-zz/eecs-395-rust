@@ -13,13 +13,14 @@ fn main() {
         panic!("Missing graph description file!");
     }
 
-    let result = reader::read_graph(&args[1]);
+    let graph_mappings = reader::read_graph(&args[1]);
+    let new_graph = graph::Graph::new(graph_mappings);
 
-    // for (key, val) in &result {
-    //     println!("{}", key);
-    //     for v in val {
-    //         println!("{}", v);
-    //     }
-    //     println!("---------");
-    // }
+    for (node, neighbors) in &new_graph.map {
+        println!("Node: {}", node);
+        for neighbor in neighbors {
+            println!("Neighbor: {}", neighbor);
+        }
+        println!("---------");
+    }
 }
