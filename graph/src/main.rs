@@ -4,6 +4,7 @@ use std::env;
 use std::io::stdin;
 
 mod reader;
+mod graph;
 
 fn main() {
     println!("Hello, world!");
