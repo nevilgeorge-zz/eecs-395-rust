@@ -4,6 +4,7 @@ use std::env;
 use std::io::stdin;
 
 mod reader;
+mod graph;
 
 fn main() {
     println!("Hello, world!");
@@ -14,11 +15,11 @@ fn main() {
 
     let result = reader::read_graph(&args[1]);
 
-    for (key, val) in &result {
-        println!("{}", key);
-        for v in val {
-            println!("{}", v);
-        }
-        println!("---------");
-    }
+    // for (key, val) in &result {
+    //     println!("{}", key);
+    //     for v in val {
+    //         println!("{}", v);
+    //     }
+    //     println!("---------");
+    // }
 }

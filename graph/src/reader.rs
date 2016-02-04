@@ -14,7 +14,7 @@ pub fn read_query<R: Read>(reader: R) -> Vec<(String, String)> {
 
             let (size, _) = tokens.size_hint();
             if size > (2 as usize) {
-                println!("{}", "Too many nodes entered!");
+                println!("Too many nodes entered!");
                 break;
             }
 
@@ -27,7 +27,6 @@ pub fn read_query<R: Read>(reader: R) -> Vec<(String, String)> {
 }
 
 pub fn read_graph(filename: &str) -> HashMap<String, Vec<String>> {
-
     let mut mapping = HashMap::<String, Vec<String>>::new();
     let f = File::open(filename).expect("Error opening graph description file!");
     let lines = BufReader::new(&f).lines();
@@ -38,19 +37,23 @@ pub fn read_graph(filename: &str) -> HashMap<String, Vec<String>> {
             let mut tokens = text.trim().split(" ");
             let key = tokens.next();
 
-            adjacent_nodes = vec![];
-            for token in tokens {
-                adjacent_nodes.push(token.to_owned());
-            }
-
+            // check there are no duplicate nodes in input file
             if let Some(node_key) = key {
+                if mapping.contains_key(node_key) {
+                    println!("Graph cannot have duplicate nodes!");
+                    break;
+                }
+
+                adjacent_nodes = vec![];
+                for token in tokens {
+                    adjacent_nodes.push(token.to_owned());
+                }
+
                 mapping.insert(node_key.to_owned(), adjacent_nodes);
             } else {
                 break;
             }
-
         }
     }
-
     mapping
 }
