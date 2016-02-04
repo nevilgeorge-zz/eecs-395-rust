@@ -38,4 +38,35 @@ impl Graph {
             set.insert(node_a.to_owned());
         }
     }
+
+    pub fn find_path(&mut self, src: String, dest: String) {
+        if !self.map.contains_key(&src) || !self.map.contains_key(&dest) {
+            panic!("A given node does not exist in the graph!");
+        }
+
+        let mut visited = HashSet::<String>::new();
+        let mut queue: Vec<String> = vec![];
+
+        let mut current_node: String;
+        let mut neighbors: &HashSet<String>;
+        queue.push(src.to_owned());
+        visited.insert(src.to_owned());
+
+        while queue.len() > 0 {
+            current_node = queue.remove(0 as usize);
+            neighbors = self.map.get(&current_node).unwrap();
+
+            for neighbor in neighbors {
+                if !visited.contains(neighbor) {
+                    visited.insert(neighbor.clone());
+                    queue.push(neighbor.clone());
+
+                    if neighbor.to_string() == dest.to_string() {
+                        break;
+                    }
+                }
+            }
+        }
+
+    }
 }
