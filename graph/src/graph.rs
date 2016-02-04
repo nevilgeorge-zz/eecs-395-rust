@@ -1,34 +1,34 @@
 // graph.rs
 
-pub struct Graph<K, V> {
-    nodes: Vec<Node<K, V>>,
+pub struct Graph {
+    nodes: Vec<Node>,
 }
 
 #[derive(Clone)]
-struct Node<K, V> {
-    key:       K,
-    value:     V,
-    neighbors: Vec<NodePtr<K, V>>,
+struct Node {
+    key:       String,
+    value:     String,
+    neighbors: Vec<NodePtr>,
 }
 
-type NodePtr<K, V> = Option<Box<Node<K, V>>>;
+type NodePtr = Option<Box<Node>>;
 
 // struct CursorMut<'a, K: 'a, V: 'a>(Option<&'a mut Node<K, V>>);
 
-impl<K, V> Graph<K, V> {
+impl Graph {
     pub fn new() -> Self {
         Graph {
             nodes: vec![],
         }
     }
 
-    pub fn add_node(&mut self, node: Node<K, V>) {
+    pub fn add_node(&mut self, node: Node) {
         self.nodes.push(node);
     }
 }
 
-impl<K, V> Node<K, V> {
-    pub fn new(k: K, v: V) -> Self {
+impl Node {
+    pub fn new(k: String, v: String) -> Self {
         Node {
             key: k,
             value: v,
@@ -36,15 +36,8 @@ impl<K, V> Node<K, V> {
         }
     }
 
-    pub fn add_neighbor<'a>(&mut self, ptr: NodePtr<K, V>) {
-        if let &Some(ref n) = ptr {
-
-        }
-        else {
-            
-        }
+    pub fn add_neighbor(&mut self, neighbor: NodePtr) {
+        self.neighbors.push(neighbor);
     }
-
-
 
 }
