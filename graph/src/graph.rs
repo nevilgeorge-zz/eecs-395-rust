@@ -46,6 +46,7 @@ impl Graph {
 
         let mut visited = HashSet::<String>::new();
         let mut queue: Vec<String> = vec![];
+        let mut prev = HashMap::<String, String>::new();
 
         let mut current_node: String;
         let mut neighbors: &HashSet<String>;
@@ -54,19 +55,35 @@ impl Graph {
 
         while queue.len() > 0 {
             current_node = queue.remove(0 as usize);
-            neighbors = self.map.get(&current_node).unwrap();
 
+            if current_node == dest.to_string() {
+                print_path(src.to_owned(), dest.to_owned(), &prev);
+                return;
+            }
+
+            neighbors = self.map.get(&current_node).unwrap();
             for neighbor in neighbors {
                 if !visited.contains(neighbor) {
                     visited.insert(neighbor.clone());
                     queue.push(neighbor.clone());
-
-                    if neighbor.to_string() == dest.to_string() {
-                        break;
-                    }
+                    prev.insert(neighbor.clone(), current_node.clone());
                 }
             }
-        }
 
+        }
+        println!("Path between {} and {} does not exist.", src, dest);
     }
+}
+
+fn print_path(src: String, dest: String, prev: &HashMap<String, String>) {
+    let mut path: String = dest.to_owned();
+    let mut curr: String = dest;
+
+    while curr != src {
+        if let Some(predecessor) = prev.get(&curr) {
+            path = predecessor.to_string() + " " + &path;
+            curr = predecessor.to_string();
+        }
+    }
+    println!("{}", path);
 }
