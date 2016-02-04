@@ -38,17 +38,21 @@ pub fn read_graph(filename: &str) -> HashMap<String, Vec<String>> {
             let mut tokens = text.trim().split(" ");
             let key = tokens.next();
 
-            adjacent_nodes = vec![];
-            for token in tokens {
-                adjacent_nodes.push(token.to_owned());
-            }
-
             if let Some(node_key) = key {
+                if mapping.contains_key(node_key) {
+                    println!("Graph cannot have duplicate nodes!");
+                    break;
+                }
+
+                adjacent_nodes = vec![];
+                for token in tokens {
+                    adjacent_nodes.push(token.to_owned());
+                }
+
                 mapping.insert(node_key.to_owned(), adjacent_nodes);
             } else {
                 break;
             }
-
         }
     }
 
