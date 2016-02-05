@@ -5,7 +5,8 @@ graph
 Nevil George nsg622
 Diane Liu dlq200
 
-Finds paths in graphs. Reads graph specifications file from command line argument
+Finds paths in graphs.
+Reads graph specifications file from command line argument and
 answers routing queries typed by user.
 
 Usage: cargo run <graphfile.dat>
@@ -14,6 +15,8 @@ ASSUMPTIONS:
 * The program runs indefinitely until the user types 'quit'.
 * Query/answer pairs are separated by new lines because we couldn't figure out
   how to display arrows '->' in the same line that users type their queries.
+* Querying for a node that doesn't exist in the graph will cause the
+  program to panic and exit.
 *
 "]
 
