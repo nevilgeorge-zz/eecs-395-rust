@@ -39,9 +39,9 @@ impl Graph {
         }
     }
 
-    pub fn find_path(&mut self, src: String, dest: String) {
+    pub fn find_path(&mut self, src: String, dest: String) -> String {
         if !self.map.contains_key(&src) || !self.map.contains_key(&dest) {
-            panic!("A given node does not exist in the graph!");
+            return "A given node does not exist in the graph!\n".to_owned();
         }
 
         let mut visited = HashSet::<String>::new();
@@ -57,8 +57,7 @@ impl Graph {
             current_node = queue.remove(0 as usize);
 
             if current_node == dest.to_string() {
-                print_path(src.to_owned(), dest.to_owned(), &prev);
-                return;
+                return get_path(src.to_owned(), dest.to_owned(), &prev);
             }
 
             neighbors = self.map.get(&current_node).unwrap();
@@ -71,11 +70,11 @@ impl Graph {
             }
 
         }
-        println!("Path between {} and {} does not exist.", src, dest);
+        return "Path does not exist.\n".to_owned();
     }
 }
 
-fn print_path(src: String, dest: String, prev: &HashMap<String, String>) {
+fn get_path(src: String, dest: String, prev: &HashMap<String, String>) -> String {
     let mut path: String = dest.to_owned();
     let mut curr: String = dest;
 
@@ -85,5 +84,6 @@ fn print_path(src: String, dest: String, prev: &HashMap<String, String>) {
             curr = predecessor.to_string();
         }
     }
-    println!("{}", path);
+    path = path + "\n";
+    path
 }

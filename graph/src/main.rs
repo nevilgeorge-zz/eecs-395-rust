@@ -11,7 +11,9 @@ answers routing queries typed by user.
 Usage: cargo run <graphfile.dat>
 
 ASSUMPTIONS:
-* 'quit' quits the program.
+* The program runs indefinitely until the user types 'quit'.
+* Query/answer pairs are separated by new lines because we couldn't figure out
+  how to display arrows '->' in the same line that users type their queries.
 *
 "]
 
@@ -43,7 +45,8 @@ fn main() {
             Ok(_) => {
                 let nodes = verify_input(input.clone());
                 if nodes.len() == 2 {
-                    new_graph.find_path(nodes[0].clone(), nodes[1].clone());
+                    let found_path = new_graph.find_path(nodes[0].clone(), nodes[1].clone());
+                    println!("{}", found_path);
                 }
             }
             Err(error) => println!("Error reading input: {}", error)
@@ -56,7 +59,7 @@ fn verify_input(input: String) -> Vec<String>  {
     let tokens: Vec<&str> = input.trim().split_whitespace().collect();
 
     if tokens.len() != 2 {
-        println!("Incorrect input format. Please enter two nodes separated by whitespace.\nUsage: <src> <dest>");
+        println!("Incorrect input format. Please enter two nodes separated by whitespace.\nUsage: <src> <dest>\n");
         return nodes;
     }
     else {

@@ -111,3 +111,69 @@ mod graph_add_edge_tests {
         assert_eq!(d_entry, None);
     }
 }
+
+#[cfg(test)]
+mod graph_find_path_tests {
+    use graph::Graph;
+    use std::collections::{HashMap, HashSet};
+
+    fn initialize_graph() -> Graph {
+        let map = HashMap::<String, Vec<String>>::new();
+        let mut new_graph = Graph::new(map);
+        let a = 'a'.to_string();
+        let b = 'b'.to_string();
+        let c = 'c'.to_string();
+        let d = 'd'.to_string();
+        let e = 'e'.to_string();
+
+        new_graph.add_node(a.clone());
+        new_graph.add_node(b.clone());
+        new_graph.add_node(c.clone());
+        new_graph.add_node(d.clone());
+        new_graph.add_node(e.clone());
+
+
+        let mut empty_set = HashSet::<String>::new();
+
+        assert_eq!(new_graph.map.get(&a), Some(&empty_set));
+        assert_eq!(new_graph.map.get(&b), Some(&empty_set));
+        assert_eq!(new_graph.map.get(&c), Some(&empty_set));
+        assert_eq!(new_graph.map.get(&d), Some(&empty_set));
+        assert_eq!(new_graph.map.get(&e), Some(&empty_set));
+
+        new_graph.add_edge(a.clone(), b.clone());
+        new_graph.add_edge(b.clone(), c.clone());
+        new_graph.add_edge(c.clone(), d.clone());
+
+        empty_set.insert(b.clone());
+
+        assert_eq!(new_graph.map.get(&a), Some(&empty_set));
+
+        new_graph
+    }
+
+    #[test]
+    fn find_path_missing_node() {
+        let mut graph = initialize_graph();
+        let path = graph.find_path("e".to_owned(), "f".to_owned());
+        assert_eq!(path, "A given node does not exist in the graph!\n".to_owned());
+    }
+
+    #[test]
+    fn find_path_missing_edge() {
+        let mut graph = initialize_graph();
+        let path = graph.find_path("a".to_owned(), "e".to_owned());
+        assert_eq!(path, "Path does not exist.\n".to_owned( ));
+    }
+
+    #[test]
+    fn find_existing_path() {
+        let mut graph = initialize_graph();
+
+        let mut path = graph.find_path("a".to_owned(), "d".to_owned());
+        assert_eq!(path, "a b c d\n".to_owned( ));
+
+        path = graph.find_path("b".to_owned(), "c".to_owned());
+        assert_eq!(path, "b c\n".to_owned( ));
+    }
+}
