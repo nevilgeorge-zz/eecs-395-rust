@@ -34,14 +34,6 @@ fn main() {
     let graph_mappings = reader::read_graph(&args[1]);
     let mut new_graph = graph::Graph::new(graph_mappings);
 
-    // for (node, neighbors) in &new_graph.map {
-    //     println!("Node: {}", node);
-    //     for neighbor in neighbors {
-    //         println!("Neighbor: {}", neighbor);
-    //     }
-    //     println!("---------");
-    // }
-
     // listen for stdin
     let mut input = String::new();
     while input != "quit\n".to_owned() {
