@@ -13,7 +13,7 @@ impl Graph {
             map: HashMap::<String, HashSet<String>>::new(),
         };
 
-        for (node, neighbors) in &mapping {
+        for (node, _) in &mapping {
             new_graph.add_node(node.to_owned());
         }
 

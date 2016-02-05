@@ -21,6 +21,7 @@ use std::io::stdin;
 
 mod reader;
 mod graph;
+mod graph_tests;
 
 fn main() {
 
@@ -52,7 +53,7 @@ fn main() {
 
 fn verify_input(input: String) -> Vec<String>  {
     let mut nodes: Vec<String> = vec![];
-    let mut tokens: Vec<&str> = input.trim().split_whitespace().collect();
+    let tokens: Vec<&str> = input.trim().split_whitespace().collect();
 
     if tokens.len() != 2 {
         println!("Incorrect input format. Please enter two nodes separated by whitespace.\nUsage: <src> <dest>");
