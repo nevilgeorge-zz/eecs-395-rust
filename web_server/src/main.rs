@@ -1,6 +1,9 @@
 // main.rs
 use std::io::Read;
 use std::net::TcpListener;
+use std::env;
+use std::fs::File;
+use std::path::{Path, PathBuf};
 use std::thread;
 
 struct Request {
@@ -15,9 +18,9 @@ fn main() {
 
     for stream in listener.incoming() {
         // spawn new thread for new connection
-        thread::spawn(|| {
+        thread::spawn(move|| {
             println!("New connection!");
-            // grab TcpStream
+            // grab TcpStream from incoming connections of TcpListener
             let mut stream = stream.unwrap();
             let mut buf = [0; 128];
             // pass in a buffer and read from connection
@@ -29,6 +32,10 @@ fn main() {
                 match result {
                     Ok(request) => {
                         println!("Correct request received!");
+                        let mut file_path = env::current_dir().unwrap();
+                        file_path.push(request.file_path);
+                        let file_contents = read_from_file(file_path);
+                        println!("{}", file_contents);
                     },
                     Err(e) => {
                         println!("{}", e);
@@ -47,9 +54,33 @@ fn parse_input(input: String) -> Result<Request, String> {
 
     let request = Request {
         method: tokens[0].to_string(),
-        file_path: tokens[1].to_string(),
+        file_path: normalize_file_path(tokens[1].to_string()),
         protocol: tokens[2].to_string(),
     };
 
     Ok(request)
+}
+
+fn normalize_file_path(file_path: String) -> String {
+    let slash_index = file_path.find('/');
+    match slash_index {
+        Some(index) => {
+            if index == 0 {
+                let slice = &file_path[1..];
+                return slice.to_owned();
+            } else {
+                return file_path;
+            }
+        },
+        None => return file_path
+    }
+}
+
+fn read_from_file(file_path: PathBuf) -> String {
+    println!("{}", file_path.display());
+    let mut f = File::open(file_path).expect("Error opening file!");
+    let mut buffer = String::new();
+    f.read_to_string(&mut buffer);
+
+    buffer
 }
