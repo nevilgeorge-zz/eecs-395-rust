@@ -3,7 +3,6 @@ use std::io::Read;
 use std::net::TcpListener;
 use std::env;
 use std::fs::File;
-use std::path::{Path, PathBuf};
 use std::thread;
 
 struct Request {
@@ -32,9 +31,7 @@ fn main() {
                 match result {
                     Ok(request) => {
                         println!("Correct request received!");
-                        let mut file_path = env::current_dir().unwrap();
-                        file_path.push(request.file_path);
-                        let file_contents = read_from_file(file_path);
+                        let file_contents = read_from_file(request.file_path);
                         println!("{}", file_contents);
                     },
                     Err(e) => {
@@ -76,11 +73,12 @@ fn normalize_file_path(file_path: String) -> String {
     }
 }
 
-fn read_from_file(file_path: PathBuf) -> String {
-    println!("{}", file_path.display());
-    let mut f = File::open(file_path).expect("Error opening file!");
+fn read_from_file(file_path: String) -> String {
+    let mut path = env::current_dir().unwrap();
+    path.push(file_path);
+    let mut file = File::open(path).unwrap();
     let mut buffer = String::new();
-    f.read_to_string(&mut buffer);
-
+    file.read_to_string(&mut buffer);
     buffer
+
 }
