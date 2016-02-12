@@ -11,6 +11,15 @@ struct Request {
     protocol: String,
 }
 
+struct Response {
+    protocol: String,
+    method: String,
+    status_code: String,
+    content_type: String,
+    content_length: usize,
+    payload: String,
+}
+
 fn main() {
     let listener = TcpListener::bind("127.0.0.1:8080").unwrap();
     println!("Ready to accept connections on port 8080.");
@@ -31,25 +40,30 @@ fn main() {
                 match result {
                     Ok(request) => {
                         println!("Correct request received!");
-                        let file_contents = read_from_file(request.file_path);
+                        let file_contents = read_from_file(request.file_path.clone());
+                        let response: Response;
                         match file_contents {
                             Ok(file_text) => {
-                                println!("{}", file_text);
+                                response = make_response(request, "200", file_text);
                             },
                             Err(err_kind) => {
                                 if err_kind == ErrorKind::NotFound {
-                                    println!("{}", "404 status".to_string());
+                                    response = make_response(request, "404", "".to_string());
                                 } else if err_kind == ErrorKind::PermissionDenied {
-                                    println!("{}", "403 status".to_string());
+                                    response = make_response(request, "403", "".to_string());
                                 } else {
                                     panic!("Error occurred with reading from file!");
                                 }
                             }
                         }
+                        println!("{}", response.payload);
+                        println!("{}", response.status_code);
+                        println!("{}", response.content_type);
+                        println!("{}", response.content_length);
                     },
                     Err(err_kind) => {
                         if err_kind == ErrorKind::InvalidInput {
-                            println!("404 status code");
+                            println!("400 status code");
                         }
                     }
                 }
@@ -91,15 +105,36 @@ fn normalize_file_path(file_path: String) -> String {
 fn read_from_file(file_path: String) -> Result<String, ErrorKind> {
     let mut path = env::current_dir().unwrap();
     path.push(file_path);
-    let mut file = File::open(path);
+    let file = File::open(path);
     match file {
         Ok(mut f) => {
             let mut buffer = String::new();
-            f.read_to_string(&mut buffer);
+            let _ = f.read_to_string(&mut buffer);
             Ok(buffer)
         },
         Err(e) => {
             Err(e.kind())
         }
+    }
+}
+
+fn get_content_type(file_path: String) -> String {
+    let mut tokens: Vec<&str> = file_path.split(".").collect();
+    let extension = tokens.pop().unwrap();
+    if extension == "html" {
+        "text/html".to_string()
+    } else {
+        "text/plain".to_string()
+    }
+}
+
+fn make_response(request: Request, status_code: &str, payload: String) -> Response {
+    Response {
+        protocol: request.protocol.clone(),
+        method: request.method.clone(),
+        status_code: status_code.to_string(),
+        content_type: get_content_type(request.file_path),
+        content_length: payload.len(),
+        payload: payload,
     }
 }
