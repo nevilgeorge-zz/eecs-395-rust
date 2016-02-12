@@ -1,5 +1,5 @@
 // main.rs
-use std::io::Read;
+use std::io::{ErrorKind, Read};
 use std::net::TcpListener;
 use std::env;
 use std::fs::File;
@@ -32,10 +32,25 @@ fn main() {
                     Ok(request) => {
                         println!("Correct request received!");
                         let file_contents = read_from_file(request.file_path);
-                        println!("{}", file_contents);
+                        match file_contents {
+                            Ok(file_text) => {
+                                println!("{}", file_text);
+                            },
+                            Err(err_kind) => {
+                                if err_kind == ErrorKind::NotFound {
+                                    println!("{}", "404 status".to_string());
+                                } else if err_kind == ErrorKind::PermissionDenied {
+                                    println!("{}", "403 status".to_string());
+                                } else {
+                                    panic!("Error occurred with reading from file!");
+                                }
+                            }
+                        }
                     },
-                    Err(e) => {
-                        println!("{}", e);
+                    Err(err_kind) => {
+                        if err_kind == ErrorKind::InvalidInput {
+                            println!("404 status code");
+                        }
                     }
                 }
             }
@@ -43,10 +58,10 @@ fn main() {
     }
 }
 
-fn parse_input(input: String) -> Result<Request, String> {
+fn parse_input(input: String) -> Result<Request, ErrorKind> {
     let tokens: Vec<&str> = input.split(" ").collect();
     if tokens.len() != 3 || tokens[0] != "GET" || !tokens[2].contains("HTTP")  {
-        return Err("400 Bad Request".to_owned());
+        return Err(ErrorKind::InvalidInput);
     }
 
     let request = Request {
@@ -73,12 +88,18 @@ fn normalize_file_path(file_path: String) -> String {
     }
 }
 
-fn read_from_file(file_path: String) -> String {
+fn read_from_file(file_path: String) -> Result<String, ErrorKind> {
     let mut path = env::current_dir().unwrap();
     path.push(file_path);
-    let mut file = File::open(path).unwrap();
-    let mut buffer = String::new();
-    file.read_to_string(&mut buffer);
-    buffer
-
+    let mut file = File::open(path);
+    match file {
+        Ok(mut f) => {
+            let mut buffer = String::new();
+            f.read_to_string(&mut buffer);
+            Ok(buffer)
+        },
+        Err(e) => {
+            Err(e.kind())
+        }
+    }
 }
