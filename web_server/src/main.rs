@@ -64,8 +64,9 @@ fn main() {
                     },
                     Err(err_kind) => {
                         if err_kind == ErrorKind::InvalidInput {
-                            // write response to stream
-                            println!("400 status code");
+                            // write response straight to stream since no request exists
+                            let response_text = "400 Bad Request \n".to_string();
+                            stream.write(response_text.as_bytes());
                         }
                     }
                 }
@@ -151,7 +152,7 @@ fn print_response(stream: &mut TcpStream, response: Response) {
     response_text = response_text + &response.status_code;
     response_text = response_text + &" ";
 
-    if response.status_code == "200" {
+    if &response.status_code == &"200" {
         response_text = response_text + &" OK\n";
         response_text = response_text + &SERVER_NAME + &"\n";
         response_text = response_text + &"Content-type: " + &response.content_type + &"\n";
@@ -160,7 +161,13 @@ fn print_response(stream: &mut TcpStream, response: Response) {
         response_text = response_text + &response.payload;
         response_text = response_text + &"\n\n";
     } else {
-        response_text = response_text + &"\n";
+        if &response.status_code == &"404" {
+            response_text = response_text + &" Not Found" + &"\n";
+        } else if &response.status_code == &"400" {
+            response_text = response_text + &" Bad Request" + &"\n";
+        } else if &response.status_code == &"403" {
+            response_text = response_text + &" Forbidden" + &"\n";
+        }
     }
 
     stream.write(response_text.as_bytes());
