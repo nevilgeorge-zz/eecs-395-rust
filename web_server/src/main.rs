@@ -3,10 +3,13 @@ use std::io::{ErrorKind, Read, Write};
 use std::net::{TcpStream, TcpListener};
 use std::env;
 use std::fs::File;
+use std::sync::{Arc, Mutex};
 use std::thread;
 
+extern crate time;
+
 // constants
-const SERVER_NAME: &'static str = "nsg622-web-server/0.1";
+const SERVER_NAME: &'static str = "nsg622-dlq200-web-server/0.1";
 
 struct Request {
     method: String,
@@ -27,34 +30,40 @@ fn main() {
     let listener = TcpListener::bind("127.0.0.1:8080").unwrap();
     println!("Ready to accept connections on port 8080.");
 
+    // create log file
+    let mut log_file_handle = File::create("log.txt").unwrap();
+    let log_file = Arc::new(Mutex::new(log_file_handle));
+
     for stream in listener.incoming() {
         // spawn new thread for new connection
+        let log_file = log_file.clone();
+
         thread::spawn(move|| {
             println!("New connection!");
             // grab TcpStream from incoming connections of TcpListener
             let mut stream = stream.unwrap();
             let input_line = read_from_stream(&mut stream);
-            let result = parse_input(input_line);
-            match result {
+            match parse_input(input_line) {
                 Ok(request) => {
                     println!("Correct request received!");
                     let file_contents = read_from_file(request.file_path.clone());
                     let response: Response;
                     match file_contents {
                         Ok(file_text) => {
-                            response = make_response(request, "200", file_text);
+                            response = make_response(&request, "200", file_text);
                         },
                         Err(err_kind) => {
                             if err_kind == ErrorKind::NotFound {
-                                response = make_response(request, "404", "".to_string());
+                                response = make_response(&request, "404", "".to_string());
                             } else if err_kind == ErrorKind::PermissionDenied {
-                                response = make_response(request, "403", "".to_string());
+                                response = make_response(&request, "403", "".to_string());
                             } else {
                                 panic!("Error occurred with reading from file!");
                             }
                         }
                     }
                     // write response to stream
+                    log_to_file(&request, &response, &log_file);
                     print_response(&mut stream, response);
                 },
                 Err(err_kind) => {
@@ -150,12 +159,12 @@ fn get_content_type(file_path: String) -> String {
     }
 }
 
-fn make_response(request: Request, status_code: &str, payload: String) -> Response {
+fn make_response(request: &Request, status_code: &str, payload: String) -> Response {
     Response {
         protocol: request.protocol.clone(),
         method: request.method.clone(),
         status_code: status_code.to_string(),
-        content_type: get_content_type(request.file_path),
+        content_type: get_content_type(request.file_path.clone()),
         content_length: payload.len(),
         payload: payload,
     }
@@ -187,4 +196,15 @@ fn print_response(stream: &mut TcpStream, response: Response) {
     }
 
     stream.write(response_text.as_bytes());
+}
+
+fn log_to_file(request: &Request, response: &Response, log_file_mutex: &Arc<Mutex<File>>) {
+    let mut file_guard = log_file_mutex.lock().unwrap();
+    let mut result = String::new();
+    result = result + &"Request: " + &request.method + &" " + &request.file_path + &"\n";
+    result = result + &"Response: " + &response.status_code + &" " + &response.content_type + &"\n";
+
+
+    result = result + &"\n\n";
+    file_guard.write(result.as_bytes());
 }
