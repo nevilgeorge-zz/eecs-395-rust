@@ -15,9 +15,6 @@ ASSUMPTIONS:
 * The program runs indefinitely until the user types 'quit'.
 * Query/answer pairs are separated by new lines because we couldn't figure out
   how to display arrows '->' in the same line that users type their queries.
-* Querying for a node that doesn't exist in the graph will cause the
-  program to panic and exit.
-*
 "]
 
 
