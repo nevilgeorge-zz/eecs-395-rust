@@ -33,46 +33,62 @@ fn main() {
             println!("New connection!");
             // grab TcpStream from incoming connections of TcpListener
             let mut stream = stream.unwrap();
-            let mut buf = [0; 128];
-            // pass in a buffer and read from connection
-            let reading = stream.read(&mut buf[..]);
-            if let Ok(_) = reading {
-                // convert utf8 buffer to string
-                let input_line = String::from_utf8(buf.to_owned()).unwrap();
-                let result = parse_input(input_line);
-                match result {
-                    Ok(request) => {
-                        println!("Correct request received!");
-                        let file_contents = read_from_file(request.file_path.clone());
-                        let response: Response;
-                        match file_contents {
-                            Ok(file_text) => {
-                                response = make_response(request, "200", file_text);
-                            },
-                            Err(err_kind) => {
-                                if err_kind == ErrorKind::NotFound {
-                                    response = make_response(request, "404", "".to_string());
-                                } else if err_kind == ErrorKind::PermissionDenied {
-                                    response = make_response(request, "403", "".to_string());
-                                } else {
-                                    panic!("Error occurred with reading from file!");
-                                }
+            let input_line = read_from_stream(&mut stream);
+            let result = parse_input(input_line);
+            match result {
+                Ok(request) => {
+                    println!("Correct request received!");
+                    let file_contents = read_from_file(request.file_path.clone());
+                    let response: Response;
+                    match file_contents {
+                        Ok(file_text) => {
+                            response = make_response(request, "200", file_text);
+                        },
+                        Err(err_kind) => {
+                            if err_kind == ErrorKind::NotFound {
+                                response = make_response(request, "404", "".to_string());
+                            } else if err_kind == ErrorKind::PermissionDenied {
+                                response = make_response(request, "403", "".to_string());
+                            } else {
+                                panic!("Error occurred with reading from file!");
                             }
                         }
-                        // write response to stream
-                        print_response(&mut stream, response);
-                    },
-                    Err(err_kind) => {
-                        if err_kind == ErrorKind::InvalidInput {
-                            // write response straight to stream since no request exists
-                            let response_text = "400 Bad Request \n".to_string();
-                            stream.write(response_text.as_bytes());
-                        }
+                    }
+                    // write response to stream
+                    print_response(&mut stream, response);
+                },
+                Err(err_kind) => {
+                    if err_kind == ErrorKind::InvalidInput {
+                        // write response straight to stream since no request exists
+                        let response_text = "400 Bad Request \n".to_string();
+                        stream.write(response_text.as_bytes());
                     }
                 }
             }
         });
     }
+}
+
+fn read_from_stream(stream: &mut TcpStream) -> String {
+    const BUF_SIZE: usize = 128;
+    let mut buf = [0; BUF_SIZE];
+    let mut result = String::new();
+    let mut addition: String;
+
+    // continually pass in a buffer until nothing left to read
+    while let Ok(length) = stream.read(&mut buf[..]) {
+        // add data in buffer to results string
+        addition = String::from_utf8(buf.to_owned()).unwrap();
+        result.push_str(&addition);
+        buf = [0; BUF_SIZE];
+
+        // break if all of input has been read
+        if length < BUF_SIZE {
+            break;
+        }
+    }
+
+    result
 }
 
 fn parse_input(input: String) -> Result<Request, ErrorKind> {
