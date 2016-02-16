@@ -1,4 +1,7 @@
 // main.rs
+extern crate chrono;
+
+use chrono::*;
 use std::io::{ErrorKind, Read, Write};
 use std::net::{TcpStream, TcpListener};
 use std::env;
@@ -6,7 +9,6 @@ use std::fs::File;
 use std::sync::{Arc, Mutex};
 use std::thread;
 
-extern crate time;
 
 // constants
 const SERVER_NAME: &'static str = "nsg622-dlq200-web-server/0.1";
@@ -200,11 +202,11 @@ fn print_response(stream: &mut TcpStream, response: Response) {
 
 fn log_to_file(request: &Request, response: &Response, log_file_mutex: &Arc<Mutex<File>>) {
     let mut file_guard = log_file_mutex.lock().unwrap();
+    let mut current_date: DateTime<Local> = Local::now();
     let mut result = String::new();
     result = result + &"Request: " + &request.method + &" " + &request.file_path + &"\n";
     result = result + &"Response: " + &response.status_code + &" " + &response.content_type + &"\n";
-
-
+    result = result + &"DateTime: " + &current_date.format("%Y-%m-%d %H:%M:%S").to_string() + &"\n";
     result = result + &"\n\n";
     file_guard.write(result.as_bytes());
 }
