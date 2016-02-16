@@ -1,9 +1,12 @@
 // main.rs
-use std::io::{ErrorKind, Read};
-use std::net::TcpListener;
+use std::io::{ErrorKind, Read, Write};
+use std::net::{TcpStream, TcpListener};
 use std::env;
 use std::fs::File;
 use std::thread;
+
+// constants
+const SERVER_NAME: &'static str = "nsg622-web-server/0.1";
 
 struct Request {
     method: String,
@@ -56,13 +59,12 @@ fn main() {
                                 }
                             }
                         }
-                        println!("{}", response.payload);
-                        println!("{}", response.status_code);
-                        println!("{}", response.content_type);
-                        println!("{}", response.content_length);
+                        // write response to stream
+                        print_response(&mut stream, response);
                     },
                     Err(err_kind) => {
                         if err_kind == ErrorKind::InvalidInput {
+                            // write response to stream
                             println!("400 status code");
                         }
                     }
@@ -78,10 +80,13 @@ fn parse_input(input: String) -> Result<Request, ErrorKind> {
         return Err(ErrorKind::InvalidInput);
     }
 
+    let protocol = tokens[2];
+    let protocol_tokens: Vec<&str> = protocol.split("\n").collect();
+
     let request = Request {
         method: tokens[0].to_string(),
         file_path: normalize_file_path(tokens[1].to_string()),
-        protocol: tokens[2].to_string(),
+        protocol: protocol_tokens[0].to_string(),
     };
 
     Ok(request)
@@ -137,4 +142,26 @@ fn make_response(request: Request, status_code: &str, payload: String) -> Respon
         content_length: payload.len(),
         payload: payload,
     }
+}
+
+fn print_response(stream: &mut TcpStream, response: Response) {
+    let mut response_text: String = "\n".to_string();
+    response_text = response_text + &response.protocol;
+    response_text = response_text + &" ";
+    response_text = response_text + &response.status_code;
+    response_text = response_text + &" ";
+
+    if response.status_code == "200" {
+        response_text = response_text + &" OK\n";
+        response_text = response_text + &SERVER_NAME + &"\n";
+        response_text = response_text + &"Content-type: " + &response.content_type + &"\n";
+        response_text = response_text + &"Content-length: " + &response.content_length.to_string() + &"\n";
+        response_text = response_text + &"\n\n";
+        response_text = response_text + &response.payload;
+        response_text = response_text + &"\n\n";
+    } else {
+        response_text = response_text + &"\n";
+    }
+
+    stream.write(response_text.as_bytes());
 }
