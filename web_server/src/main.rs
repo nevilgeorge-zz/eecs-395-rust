@@ -1,4 +1,21 @@
 // main.rs
+#[doc="
+web_server
+
+Nevil George nsg622
+Diane Liu dlq200
+Thornton Uhl tcu406
+
+Basic web server that handles HTTP/0.9 GET requests.
+
+Usage: cargo run
+Starts the web server.
+Listens on localhost:8080
+
+ASSUMPTIONS:
+* 
+"]
+
 extern crate chrono;
 
 use chrono::*;
@@ -11,7 +28,7 @@ use std::thread;
 
 
 // constants
-const SERVER_NAME: &'static str = "nsg622-dlq200-web-server/0.1";
+const SERVER_NAME: &'static str = "nsg622-dlq200-tcu406-web-server/0.1";
 
 struct Request {
     method: String,
@@ -103,8 +120,6 @@ fn read_from_stream(stream: &mut TcpStream) -> String {
 }
 
 fn parse_input(input: String) -> Result<Request, ErrorKind> {
-    println!("{}", input);
-
     let tokens: Vec<&str> = input.split_whitespace().collect();
     if tokens.len() < 3 || tokens[0] != "GET" || !tokens[2].contains("HTTP")  {
         return Err(ErrorKind::InvalidInput);
