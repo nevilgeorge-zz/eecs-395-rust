@@ -103,18 +103,21 @@ fn read_from_stream(stream: &mut TcpStream) -> String {
 }
 
 fn parse_input(input: String) -> Result<Request, ErrorKind> {
-    let tokens: Vec<&str> = input.split(" ").collect();
-    if tokens.len() != 3 || tokens[0] != "GET" || !tokens[2].contains("HTTP")  {
+    println!("{}", input);
+
+    let tokens: Vec<&str> = input.split_whitespace().collect();
+    if tokens.len() < 3 || tokens[0] != "GET" || !tokens[2].contains("HTTP")  {
         return Err(ErrorKind::InvalidInput);
     }
 
-    let protocol = tokens[2];
-    let protocol_tokens: Vec<&str> = protocol.split("\n").collect();
+    // let protocol = tokens[2];
+    // let protocol_tokens: Vec<&str> = protocol.split("\n").collect();
 
     let request = Request {
         method: tokens[0].to_string(),
         file_path: normalize_file_path(tokens[1].to_string()),
-        protocol: protocol_tokens[0].to_string(),
+        // protocol: protocol_tokens[0].to_owned(),
+        protocol: tokens[2].to_string(),
     };
 
     Ok(request)
@@ -173,11 +176,11 @@ fn make_response(request: &Request, status_code: &str, payload: String) -> Respo
 }
 
 fn print_response(stream: &mut TcpStream, response: Response) {
-    let mut response_text: String = "\n".to_string();
-    response_text = response_text + &response.protocol;
-    response_text = response_text + &" ";
+    let mut response_text: String = "HTTP/1.0 ".to_string();
+    // response_text = response_text + &response.protocol;
+    // response_text = response_text + &" ";
     response_text = response_text + &response.status_code;
-    response_text = response_text + &" ";
+    // response_text = response_text + &" ";
 
     if &response.status_code == &"200" {
         response_text = response_text + &" OK\n";
