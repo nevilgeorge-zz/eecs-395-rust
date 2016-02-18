@@ -33,20 +33,16 @@ pub fn parse_input(input: String) -> Result<Request, ErrorKind> {
         return Err(ErrorKind::InvalidInput);
     }
 
-    // let protocol = tokens[2];
-    // let protocol_tokens: Vec<&str> = protocol.split("\n").collect();
-
     let request = Request {
         method: tokens[0].to_string(),
         file_path: normalize_file_path(tokens[1].to_string()),
-        // protocol: protocol_tokens[0].to_owned(),
         protocol: tokens[2].to_string(),
     };
 
     Ok(request)
 }
 
-fn normalize_file_path(file_path: String) -> String {
+pub fn normalize_file_path(file_path: String) -> String {
     let slash_index = file_path.find('/');
     match slash_index {
         Some(index) => {

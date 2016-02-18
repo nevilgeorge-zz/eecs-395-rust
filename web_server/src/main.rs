@@ -27,6 +27,7 @@ use std::thread;
 
 mod request_handler;
 mod response_handler;
+mod request_handler_tests;
 
 const SERVER_NAME: &'static str = "nsg622-dlq200-tcu406-web-server/0.1";
 
