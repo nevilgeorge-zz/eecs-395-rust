@@ -15,7 +15,7 @@ pub fn make_response(request: &Request, status_code: &str, payload: String) -> R
     }
 }
 
-fn get_content_type(file_path: String) -> String {
+pub fn get_content_type(file_path: String) -> String {
     let mut tokens: Vec<&str> = file_path.split(".").collect();
     let extension = tokens.pop().unwrap();
     if extension == "html" {
