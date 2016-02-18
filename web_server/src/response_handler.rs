@@ -27,10 +27,7 @@ fn get_content_type(file_path: String) -> String {
 
 pub fn print_response(stream: &mut TcpStream, response: Response) {
     let mut response_text: String = "HTTP/1.0 ".to_string();
-    // response_text = response_text + &response.protocol;
-    // response_text = response_text + &" ";
     response_text = response_text + &response.status_code;
-    // response_text = response_text + &" ";
 
     if &response.status_code == &"200" {
         response_text = response_text + &" OK\n";
